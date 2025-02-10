@@ -2,6 +2,10 @@
 
 set -eu
 
+if [ -n "${CI-}" ]; then
+  sudo apt-get install -y --no-install-recommends ninja-build yasm
+fi
+
 # Set up environment
 NDK=$ANDROID_NDK_HOME
 
@@ -33,7 +37,7 @@ case $ABI in
     ;;
 esac
 
-PREFIX="$PWD/prefix"
+PREFIX="$PWD/deps-prefix-android-$ABI"
 
 TOOLCHAIN="$NDK/toolchains/llvm/prebuilt/linux-x86_64"
 SYSROOT="$TOOLCHAIN/sysroot"
@@ -91,6 +95,7 @@ cmake -B _build -G Ninja \
   -DDHT_BOOTSTRAP=OFF \
   -DBOOTSTRAP_DAEMON=OFF \
   -DUNITTEST=OFF \
+  -DSTRICT_ABI=ON \
   -DMIN_LOGGER_LEVEL=TRACE \
   -DEXPERIMENTAL_API=ON
 cmake --build _build

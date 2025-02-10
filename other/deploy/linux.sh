@@ -7,7 +7,7 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ARCH="$1"
 "$SCRIPT_DIR/deps.sh" linux "$ARCH"
 
-export PKG_CONFIG_PATH="$PWD/prefix/lib/pkgconfig"
+export PKG_CONFIG_PATH="$PWD/deps-prefix-linux-$ARCH/lib/pkgconfig"
 
 # Build
 cmake \
@@ -21,6 +21,7 @@ cmake \
   -DDHT_BOOTSTRAP=OFF \
   -DBOOTSTRAP_DAEMON=OFF \
   -DUNITTEST=OFF \
+  -DSTRICT_ABI=ON \
   -DMIN_LOGGER_LEVEL=TRACE \
   -DEXPERIMENTAL_API=ON
 
