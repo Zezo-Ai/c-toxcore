@@ -154,7 +154,7 @@ uint32_t tox_version_minor(void);
  * Incremented when bugfixes are applied without changing any functionality or
  * API or ABI.
  */
-#define TOX_VERSION_PATCH              20
+#define TOX_VERSION_PATCH              21
 
 uint32_t tox_version_patch(void);
 
@@ -540,7 +540,7 @@ typedef enum Tox_Err_Bootstrap {
 const char *tox_err_bootstrap_to_string(Tox_Err_Bootstrap value);
 
 /**
- * @brief Sends a "get nodes" request to the given bootstrap node with IP, port,
+ * @brief Sends a "nodes request" to the given bootstrap node with IP, port,
  *   and public key to setup connections.
  *
  * This function will attempt to connect to the node using UDP. You must use

@@ -4,24 +4,39 @@ set -eux -o pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
-ARCH="$1"
-"$SCRIPT_DIR/deps.sh" ios "$ARCH"
+TARGET="$1"
 
-export PKG_CONFIG_PATH="$PWD/prefix/lib/pkgconfig"
-
-IOS_FLAGS="-miphoneos-version-min=10.0 -arch $ARCH"
-
-if [ "$ARCH" = "i386" ] || [ "$ARCH" = "x86_64" ]; then
-  XC_SDK="iphonesimulator"
-else
-  XC_SDK="iphoneos"
+if [ -n "${CI-}" ]; then
+  brew install bash coreutils ninja yasm
 fi
+
+SYSTEM="${TARGET%%-*}"
+ARCH="${TARGET#*-}"
+
+"$SCRIPT_DIR/deps.sh" "$SYSTEM" "$ARCH"
+
+export PKG_CONFIG_PATH="$PWD/deps-prefix-$SYSTEM-$ARCH/lib/pkgconfig"
+
+if [ "$SYSTEM" = "ios" ]; then
+  XC_SDK="iphoneos"
+  TARGET_IPHONE_SIMULATOR=OFF
+  IOS_FLAGS="-miphoneos-version-min=10.0 -arch $ARCH"
+elif [ "$SYSTEM" = "iphonesimulator" ]; then
+  XC_SDK="iphonesimulator"
+  TARGET_IPHONE_SIMULATOR=ON
+  IOS_FLAGS="-arch $ARCH"
+else
+  echo "Unexpected system $SYSTEM"
+  exit 1
+fi
+
+BUILD_DIR="_build-$SYSTEM-$ARCH"
 
 # Build for iOS 10
 cmake \
-  -B _build \
+  -B "$BUILD_DIR" \
   -G Ninja \
-  -DCMAKE_INSTALL_PREFIX="$PWD/toxcore-ios-$ARCH" \
+  -DCMAKE_INSTALL_PREFIX="$PWD/toxcore-$SYSTEM-$ARCH" \
   -DCMAKE_BUILD_TYPE=Release \
   -DENABLE_STATIC=OFF \
   -DENABLE_SHARED=ON \
@@ -29,6 +44,7 @@ cmake \
   -DDHT_BOOTSTRAP=OFF \
   -DBOOTSTRAP_DAEMON=OFF \
   -DUNITTEST=OFF \
+  -DSTRICT_ABI=ON \
   -DMIN_LOGGER_LEVEL=TRACE \
   -DEXPERIMENTAL_API=ON \
   -DCMAKE_C_FLAGS="$IOS_FLAGS" \
@@ -38,5 +54,5 @@ cmake \
   -DCMAKE_OSX_SYSROOT="$(xcrun --sdk "$XC_SDK" --show-sdk-path)" \
   -DCMAKE_OSX_ARCHITECTURES="$ARCH"
 
-cmake --build _build
-cmake --install _build
+cmake --build "$BUILD_DIR"
+cmake --install "$BUILD_DIR"

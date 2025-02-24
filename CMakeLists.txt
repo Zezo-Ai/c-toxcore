@@ -44,7 +44,7 @@ set_source_files_properties(
 # versions in a synchronised way.
 set(PROJECT_VERSION_MAJOR "0")
 set(PROJECT_VERSION_MINOR "2")
-set(PROJECT_VERSION_PATCH "20")
+set(PROJECT_VERSION_PATCH "21")
 set(PROJECT_VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
 
 # set .so library version / following libtool scheme
@@ -238,7 +238,7 @@ set(toxcore_SOURCES
   toxcore/events/conference_peer_list_changed.c
   toxcore/events/conference_peer_name.c
   toxcore/events/conference_title.c
-  toxcore/events/dht_get_nodes_response.c
+  toxcore/events/dht_nodes_response.c
   toxcore/events/events_alloc.c
   toxcore/events/events_alloc.h
   toxcore/events/file_chunk_request.c
